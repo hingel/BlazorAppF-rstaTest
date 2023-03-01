@@ -1,0 +1,93 @@
+﻿@page "/demo"
+@using BlazorAppFörstaTest.Shared
+@using BlazorAppFörstaTest.Shared.DTOs
+@using Microsoft.AspNetCore.Components
+
+<PageTitle>Demo</PageTitle>
+
+
+<h3>Demo</h3>
+
+<div class="container">
+	<h1 class="text-dark col-12">Counter is: @Counter</h1>
+	<button class="btn btn-info text-dark col-3" @onclick="CountUp">+</button>
+	<button class="btn btn-info text-dark col-3" @onclick="CountDown">-</button>
+	<button class="btn btn-info text-dark col-3" @onclick="Reset">Reset</button>
+</div>
+
+<EditForm class="mt-3" Model="_currentPersonDto" OnSubmit="SavePerson">
+	<InputText @bind-Value="_currentPersonDto.FirstName"/>
+	<InputText @bind-Value="_currentPersonDto.LastName"/>
+	<InputNumber @bind-Value="_currentPersonDto.Age"/>
+	<button>Save Person</button>
+</EditForm>
+
+<button class="btn btn-danger" @onclick="GetNames">Get Names</button>
+
+<ul class="container mt-3 card-group m-3 row-cols-2 ">
+	
+	<Virtualize Items="Names.OrderBy(s => s.Age).ToArray()" Context="person">
+		<div class="card col-5">
+			<div class="card-header">
+				<h3 class="text-dark">@_currentPersonDto.Age</h3>
+			</div>
+			<div class="card-body">
+				<h3 class="text-dark">@person.FirstName @person.LastName</h3>
+			</div>
+		</div>
+		
+		@*		
+			<h4 class="text-dark">@person.FirstName</h4>
+			<h4 class="text-dark">@person.LastName</h4>
+			<h4 class="text-dark">@person.Age</h4>*@
+	</Virtualize>
+
+	@*
+	@foreach (var name in Names)
+	{
+		<h4>@name</h4>
+	}*@
+
+</ul>
+
+
+
+@code {
+	public int Counter { get; set; } = 0;
+	List<PersonDto> Names { get; set; } = new();
+	PersonDto _currentPersonDto = new PersonDto(); //Behöver inte vara en property egentligen.
+
+	private void CountUp()
+	{
+		Counter++;
+	}
+
+	private void CountDown()
+	{
+		Counter--;
+	}
+	
+
+	private void Reset()
+	{
+		Counter =0;
+	}
+
+	private void GetNames()
+	{
+		Names.AddRange(new List<PersonDto>()
+		{
+			new PersonDto() { FirstName = "Henrik", LastName = "Ing", Age = 43 },
+			new PersonDto() { FirstName = "Chris", LastName = "Rob", Age = 41 }
+		});
+	}
+
+
+	private void SavePerson()
+	{
+		Names.Add(_currentPersonDto);
+		_currentPersonDto = new PersonDto(); //Rensar formuläret med en tom person
+		//Detta kan sen skickas med ett PostAPI
+	}
+
+}

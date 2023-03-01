@@ -1,0 +1,46 @@
+﻿@page "/Login"
+@using BlazorAppFörstaTest.Shared.DTOs
+@using BlazorAppFörstaTest.Shared
+@inject HttpClient HttpClient
+@inject ISessionStorageService SessionStorageService
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@inject NavigationManager NavigationManager
+
+
+<h3>Login</h3>
+
+<EditForm Model="UserLogin" OnValidSubmit="LoginUser">
+	<DataAnnotationsValidator/>
+	<div class="mb-3">
+		<label for="email">Email</label>
+		<InputText id="email" @bind-Value="UserLogin.Email"/>
+	</div>
+	<div class="mb-3">
+		<label for="password">Password</label>
+		<InputText id="password" @bind-Value="UserLogin.Password" type="password"/>
+	</div>
+	<button class="btn btn-primary">Login</button>
+	<ValidationSummary/>
+</EditForm>
+
+@code {
+
+	UserLoginDto UserLogin { get; set; } = new();
+
+
+	private async Task LoginUser()
+	{
+		var response = await HttpClient.PostAsJsonAsync("user/login", UserLogin);
+		var result = await response.Content.ReadFromJsonAsync<ServiceResponse<string>>();
+
+		if (result.Success)
+		{
+			SessionStorageService.SetItem("authToken", result.Data);
+			await AuthenticationStateProvider.GetAuthenticationStateAsync();
+			NavigationManager.NavigateTo(""); //Navigaerar till startsidan när inloggningen är ok.
+			Console.WriteLine(result.Message);
+		}
+
+	}
+
+}

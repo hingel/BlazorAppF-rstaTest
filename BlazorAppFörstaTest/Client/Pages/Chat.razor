@@ -1,0 +1,58 @@
+﻿@page "/chat"
+@using Microsoft.AspNetCore.Authorization
+
+
+@inject NavigationManager NavigationManager;
+@inject HttpClient HttpClient;
+@attribute [Authorize]
+
+<h3>Chat</h3>
+
+<EditForm Model="CurrentMessage" OnSubmit="SendMessage">
+	<div class="form-control mb-3">
+		<label>Name</label>
+		<InputText @bind-Value="CurrentMessage.Name"></InputText>
+	</div>
+	<div class="form-control py-3">
+		<label>Message</label>
+		<InputTextArea @bind-Value="CurrentMessage.Message"></InputTextArea>
+	</div>
+	<button class="btn btn-primary py-3 m-3">Send</button>
+</EditForm>
+
+<ul class="container">
+	<Virtualize Items="Messages.OrderByDescending(m => m.TimeStamp).ToList()" Context="message">
+		<li class="list-group">
+			<div class="card list-group-item mb-2">
+				<div class="card-header bg-secondary bg-gradient text-light mb-1 pinkaroo">
+					@message.TimeStamp.Date.ToLocalTime().ToString("HH:mm") @message.Name
+				</div>
+				<div class="card-body">
+					@message.Message
+				</div>
+			</div>
+		</li>
+	</Virtualize>
+</ul>
+
+
+@code {
+	//Detta är flyttat till egen fil, se Chat.razor.cs:
+
+	//public ChatMessageDto CurrentMessage { get; set; } = new ();
+	//public List<ChatMessageDto> Messages { get; set; }
+	
+	//protected override async Task OnInitializedAsync() //Kan göra samma saker här i som i en konstruktor
+	//{
+	//	Messages = new List<ChatMessageDto>();
+	//	await base.OnInitializedAsync();
+	//}
+
+	//private void SendMessage()
+	//{
+	//	CurrentMessage.TimeStamp = DateTime.UtcNow; //Bättre att spara som UTC för att spara tiden.
+	//	Messages.Add(CurrentMessage);
+	//	CurrentMessage = new ChatMessageDto();
+	//}
+
+}
